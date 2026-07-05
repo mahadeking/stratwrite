@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        width: 260px;
+        font: 400 13px/1.45 Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        color: #1f2333;
+        background: #fff;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 14px 10px;
+      }
+      .logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 700;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      }
+      .name {
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .sub {
+        padding: 0 14px 10px;
+        color: #636e88;
+        font-size: 12px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-top: 1px solid #f0f1f4;
+      }
+      .switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        inset: 0;
+        background: #d4d8e0;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .slider::before {
+        content: '';
+        position: absolute;
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        top: 3px;
+        background: #fff;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      input:checked + .slider {
+        background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+      }
+      input:checked + .slider::before {
+        transform: translateX(18px);
+      }
+      a.open {
+        display: block;
+        padding: 12px 14px;
+        border-top: 1px solid #f0f1f4;
+        color: #4f46e5;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      a.open:hover {
+        background: #f7f7fb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <span class="logo">S</span>
+      <span class="name">StratWrite</span>
+    </div>
+    <div class="sub">Writing suggestions on any site — by Transparency Strategies.</div>
+    <div class="row">
+      <span>Enable suggestions</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <a class="open" href="https://stratwrite.netlify.app" target="_blank">Open the StratWrite editor →</a>
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -81,17 +81,17 @@ export default function Topbar({ title, onTitle, stats, onHome, onClear, onSampl
         <span className="font-600 text-ink-600">{stats.words}</span> words
       </div>
 
-      <div className="mx-1 h-6 w-px bg-ink-100" />
+      <div className="mx-1 hidden h-6 w-px bg-ink-100 sm:block" />
 
       <button
         onClick={onSample}
-        className="rounded-lg px-2.5 py-1.5 text-[13px] font-600 text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-700"
+        className="hidden rounded-lg px-2.5 py-1.5 text-[13px] font-600 text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-700 sm:block"
       >
         Try sample
       </button>
       <button
         onClick={onClear}
-        className="rounded-lg px-2.5 py-1.5 text-[13px] font-600 text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-700"
+        className="hidden rounded-lg px-2.5 py-1.5 text-[13px] font-600 text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-700 sm:block"
       >
         Clear
       </button>

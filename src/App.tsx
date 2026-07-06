@@ -104,6 +104,7 @@ export default function App() {
     }
   })
   const [showSettings, setShowSettings] = useState(false)
+  const [mobilePanel, setMobilePanel] = useState(false)
 
   // Apply the dark theme class on <html>.
   useEffect(() => {
@@ -453,8 +454,8 @@ export default function App() {
       />
 
       <div className="flex min-h-0 flex-1">
-        <main className="min-w-0 flex-1 overflow-y-auto bg-ink-50 py-6">
-          <div className="mx-auto flex h-full min-h-[70vh] max-w-3xl flex-col px-4">
+        <main className="min-w-0 flex-1 overflow-y-auto bg-ink-50 py-3 sm:py-6">
+          <div className="mx-auto flex h-full min-h-[70vh] max-w-3xl flex-col px-2 sm:px-4">
             <div className="flex h-full min-h-[70vh] flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-card">
               <Toolbar onCommand={() => editorRef.current?.focus()} />
               <div className="min-h-0 flex-1 overflow-hidden">
@@ -478,6 +479,14 @@ export default function App() {
           </div>
         </main>
 
+        {/* Backdrop for the mobile review panel */}
+        {mobilePanel && (
+          <div
+            onClick={() => setMobilePanel(false)}
+            className="fixed inset-0 z-40 bg-ink-900/40 lg:hidden"
+          />
+        )}
+
         <Sidebar
           result={visibleResult}
           visible={visible}
@@ -490,15 +499,29 @@ export default function App() {
           onApply={applyFix}
           onDismiss={dismiss}
           onAddToDictionary={addToDictionary}
+          mobileOpen={mobilePanel}
+          onCloseMobile={() => setMobilePanel(false)}
         />
       </div>
 
+      {/* Floating "Review" button (mobile only) */}
+      <button
+        onClick={() => setMobilePanel(true)}
+        className="fixed bottom-4 right-4 z-30 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-brand-600 to-violetish-500 px-4 py-2.5 text-[13.5px] font-600 text-white shadow-pop lg:hidden"
+      >
+        Review
+        {visible.length > 0 && (
+          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-white/25 px-1 text-[11.5px]">
+            {visible.length}
+          </span>
+        )}
+      </button>
     </div>
     )
 
   return (
-    <div className="h-screen w-screen overflow-hidden p-2 sm:p-3.5">
-      <div className="mx-auto h-full max-w-[1520px] overflow-hidden rounded-4xl border border-white/70 bg-white/80 shadow-float">
+    <div className="h-screen w-screen overflow-hidden p-0 sm:p-3.5">
+      <div className="mx-auto h-full max-w-[1520px] overflow-hidden border-0 bg-white/80 shadow-none sm:rounded-4xl sm:border sm:border-white/70 sm:shadow-float">
         {content}
       </div>
       {view === 'editor' && settings.inlinePopup && activeSuggestion && activeRect && (

@@ -71,6 +71,11 @@ export default function DocsHome(props: Props) {
   const [folderFilter, setFolderFilter] = useState<string | null>(null)
   const [addingFolder, setAddingFolder] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
+  const [navOpen, setNavOpen] = useState(false)
+  const goNav = (n: Nav) => {
+    setNav(n)
+    setNavOpen(false)
+  }
   const fileRef = useRef<HTMLInputElement>(null)
 
   const versionDocCount = Object.keys(versions).filter((k) => versions[k]?.length).length
@@ -80,6 +85,7 @@ export default function DocsHome(props: Props) {
   const openDocs = () => {
     setNav('docs')
     setFolderFilter(null)
+    setNavOpen(false)
   }
   const commitNewFolder = () => {
     if (newFolderName.trim()) props.onCreateFolder(newFolderName)
@@ -94,8 +100,16 @@ export default function DocsHome(props: Props) {
 
   return (
     <div className="flex h-full w-full bg-white/60">
+      {/* Mobile drawer backdrop */}
+      {navOpen && (
+        <div onClick={() => setNavOpen(false)} className="fixed inset-0 z-40 bg-ink-900/40 lg:hidden" />
+      )}
       {/* Sidebar */}
-      <aside className="flex w-[248px] shrink-0 flex-col border-r border-ink-100 bg-ink-50/50 px-3 py-4">
+      <aside
+        className={`z-50 flex w-[248px] shrink-0 flex-col border-r border-ink-100 bg-ink-50/95 px-3 py-4 backdrop-blur transition-transform duration-200 max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:shadow-pop lg:static lg:translate-x-0 lg:bg-ink-50/50 lg:backdrop-blur-none ${
+          navOpen ? 'translate-x-0' : 'max-lg:-translate-x-full'
+        }`}
+      >
         <div className="flex items-center gap-2 px-2">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-violetish-500 text-white shadow-sm">
             <svg width="18" height="18" viewBox="0 0 32 32">
@@ -113,11 +127,11 @@ export default function DocsHome(props: Props) {
 
         <nav className="mt-6 space-y-1">
           <NavItem active={nav === 'docs' && !folderFilter} onClick={openDocs} label="Docs" count={docs.length} icon={<DocIcon />} />
-          <NavItem active={nav === 'templates'} onClick={() => setNav('templates')} label="Templates" icon={<TemplateIcon />} />
-          <NavItem active={nav === 'versions'} onClick={() => setNav('versions')} label="Version history" count={versionDocCount} icon={<HistoryIcon />} />
-          <NavItem active={nav === 'trash'} onClick={() => setNav('trash')} label="Trash" count={trashed.length} icon={<TrashIcon />} />
-          <NavItem active={nav === 'account'} onClick={() => setNav('account')} label="Account" icon={<AccountIcon />} />
-          <NavItem active={nav === 'apps'} onClick={() => setNav('apps')} label="Apps" badge="AI" icon={<AppsIcon />} />
+          <NavItem active={nav === 'templates'} onClick={() => goNav('templates')} label="Templates" icon={<TemplateIcon />} />
+          <NavItem active={nav === 'versions'} onClick={() => goNav('versions')} label="Version history" count={versionDocCount} icon={<HistoryIcon />} />
+          <NavItem active={nav === 'trash'} onClick={() => goNav('trash')} label="Trash" count={trashed.length} icon={<TrashIcon />} />
+          <NavItem active={nav === 'account'} onClick={() => goNav('account')} label="Account" icon={<AccountIcon />} />
+          <NavItem active={nav === 'apps'} onClick={() => goNav('apps')} label="Apps" badge="AI" icon={<AppsIcon />} />
         </nav>
 
         {/* Folders */}
@@ -162,6 +176,7 @@ export default function DocsHome(props: Props) {
                 onClick={() => {
                   setNav('docs')
                   setFolderFilter(f.id)
+                  setNavOpen(false)
                 }}
                 onDelete={() => {
                   props.onDeleteFolder(f.id)
@@ -173,7 +188,7 @@ export default function DocsHome(props: Props) {
         </div>
 
         <div className="mt-auto space-y-1">
-          <NavItem active={nav === 'support'} onClick={() => setNav('support')} label="Support" icon={<HelpIcon />} />
+          <NavItem active={nav === 'support'} onClick={() => goNav('support')} label="Support" icon={<HelpIcon />} />
           <div className="flex items-center gap-2.5 rounded-lg px-3 py-2">
             <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-600 text-[12px] font-700 text-white">S</span>
             <div className="min-w-0">
@@ -187,7 +202,16 @@ export default function DocsHome(props: Props) {
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Top band with actions cluster (AlignIQ-style) */}
-        <div className="flex h-16 shrink-0 items-center justify-end gap-2.5 px-8">
+        <div className="flex h-16 shrink-0 items-center justify-end gap-2.5 px-4 sm:px-8">
+          <button
+            onClick={() => setNavOpen(true)}
+            aria-label="Open menu"
+            className="mr-auto grid h-10 w-10 place-items-center rounded-full bg-white text-ink-600 shadow-card lg:hidden"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
           <button
             onClick={() => setShowUnlock(true)}
             className="inline-flex items-center gap-1.5 rounded-full border border-delivery/30 bg-[#f3efff] px-3.5 py-2 text-[12.5px] font-700 text-delivery transition-colors hover:bg-[#ebe4ff]"
@@ -227,7 +251,7 @@ export default function DocsHome(props: Props) {
         </div>
 
         {/* Toolbar */}
-        <div className="flex flex-wrap items-center gap-3 px-8 pb-1 pt-5">
+        <div className="flex flex-wrap items-center gap-3 px-4 pb-1 pt-5 sm:px-8">
           <h1 className="text-[26px] font-700 tracking-tight text-ink-900" style={{ fontWeight: 700 }}>
             {nav === 'docs' && activeFolder ? activeFolder.name : TITLES[nav]}
           </h1>
@@ -275,7 +299,7 @@ export default function DocsHome(props: Props) {
           )}
 
           {(nav === 'docs' || nav === 'trash' || nav === 'versions') && (
-            <div className="relative ml-auto">
+            <div className="relative w-full sm:ml-auto sm:w-auto">
               <svg width="16" height="16" viewBox="0 0 24 24" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-300">
                 <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
                 <path d="M21 21l-4.3-4.3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -284,14 +308,14 @@ export default function DocsHome(props: Props) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search"
-                className="w-60 rounded-full border border-ink-200 bg-white py-2 pl-8 pr-3 text-[13.5px] text-ink-700 shadow-card outline-none placeholder:text-ink-300 focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                className="w-full rounded-full border border-ink-200 bg-white py-2 pl-8 pr-3 text-[13.5px] text-ink-700 shadow-card outline-none placeholder:text-ink-300 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 sm:w-60"
               />
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-8 py-6">
+        <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-8">
           {nav === 'docs' && (
             <DocGrid
               docs={folderFilter ? docs.filter((d) => d.folderId === folderFilter) : docs}

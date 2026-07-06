@@ -18,6 +18,18 @@ const EXTRA = [
 ]
 for (const w of EXTRA) DICT.add(w)
 
+// Common acronyms/initialisms — so we don't flag them once we start checking
+// ALL-CAPS words. (Lowercased; known() lowercases before lookup.)
+const ACRONYMS = [
+  'nasa', 'html', 'css', 'http', 'https', 'xml', 'json', 'sql', 'uri', 'cfo',
+  'cto', 'coo', 'hr', 'fbi', 'cia', 'nsa', 'usa', 'uk', 'eu', 'un', 'seo',
+  'pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'ui', 'ux', 'tv', 'pc', 'id',
+  'iq', 'ml', 'vr', 'ar', 'gps', 'usb', 'ram', 'cpu', 'gpu', 'os', 'ios',
+  'pin', 'atm', 'diy', 'asap', 'rsvp', 'aka', 'vip', 'pm', 'am', 'us', 'ok',
+  'ceo', 'faq', 'ceo', 'wifi', 'url', 'api', 'sms', 'gif', 'ceo', 'phd',
+]
+for (const a of ACRONYMS) DICT.add(a)
+
 // A small set of frequent words used to rank suggestions (more common first).
 const COMMON = new Set<string>([
   'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'it', 'for',
@@ -102,9 +114,10 @@ export function checkSpelling(text: string, userDict?: Set<string>): Suggestion[
   WORD_RE.lastIndex = 0
   while ((m = WORD_RE.exec(text)) !== null) {
     const word = m[0]
-    // Skip: short words, acronyms (ALL CAPS), words with no lowercase letters.
+    // Skip very short tokens and anything containing digits.
     if (word.length <= 2) continue
-    if (word === word.toUpperCase()) continue
+    // ALL-CAPS words ARE checked now (via known(), which lowercases) — real
+    // acronyms live in the dictionary/ACRONYMS list, so only typos get flagged.
     if (known(word)) continue
     if (userDict && userDict.has(word.toLowerCase().replace(/’/g, "'"))) continue
 

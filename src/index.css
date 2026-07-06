@@ -44,8 +44,18 @@ html.dark .border-ink-100 { border-color: #2b3040 !important; }
 html.dark [class*="border-ink-100/"] { border-color: #2b3040 !important; }
 html.dark .border-ink-200 { border-color: #353b4c !important; }
 html.dark [class*="border-white/"] { border-color: #2b3040 !important; }
-/* Editor caret + selection */
-html.dark .rich-editor { color: #edeff5; }
+/* Editor text + caret + selection */
+html.dark .rich-editor,
+html.dark .rich-editor div,
+html.dark .rich-editor p,
+html.dark .rich-editor span,
+html.dark .rich-editor h1,
+html.dark .rich-editor h2,
+html.dark .rich-editor li {
+  color: #edeff5 !important;
+}
+html.dark .rich-editor a { color: #a5b4fc !important; }
+html.dark .rich-editor.is-empty::before { color: #5b6172; }
 html.dark ::selection { background: rgba(129, 140, 248, 0.35); }
 
 html,

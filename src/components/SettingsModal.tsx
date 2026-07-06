@@ -4,6 +4,7 @@ export interface Settings {
   underlines: boolean
   inlinePopup: boolean
   tone: boolean
+  dark: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -12,6 +13,7 @@ export const DEFAULT_SETTINGS: Settings = {
   underlines: true,
   inlinePopup: true,
   tone: true,
+  dark: true,
 }
 
 interface Props {
@@ -77,6 +79,18 @@ export default function SettingsModal({ settings, onToggle, onClose }: Props) {
                 <Toggle on={settings[t.key]} onClick={() => toggle(t.key)} label={t.label} />
               </div>
             ))}
+          </div>
+
+          {/* Appearance */}
+          <h3 className="mb-1 mt-5 text-[14px] font-700 text-ink-900" style={{ fontWeight: 700 }}>
+            Appearance
+          </h3>
+          <div className="flex items-center gap-3 border-t border-ink-50 py-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-[13.5px] font-600 text-ink-800">Dark mode</div>
+              <div className="text-[12px] text-ink-500">Use a dark colour theme across the app.</div>
+            </div>
+            <Toggle on={settings.dark} onClick={() => toggle('dark')} label="Dark mode" />
           </div>
 
           {/* Shortcuts */}

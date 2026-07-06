@@ -104,6 +104,12 @@ export default function App() {
     }
   })
   const [showSettings, setShowSettings] = useState(false)
+
+  // Apply the dark theme class on <html>.
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', settings.dark)
+  }, [settings.dark])
+
   const toggleSetting = (key: keyof Settings) => {
     setSettings((prev) => {
       const next = { ...prev, [key]: !prev[key] }

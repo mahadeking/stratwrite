@@ -8,6 +8,46 @@
   color-scheme: light;
 }
 
+/* ============================================================
+   DARK THEME — applied when <html> has the `dark` class.
+   Scoped overrides so components don't each need dark: variants.
+   ============================================================ */
+html.dark {
+  color-scheme: dark;
+}
+html.dark body {
+  background: linear-gradient(135deg, #0e0f17 0%, #141327 45%, #1a1220 100%);
+}
+/* Surfaces */
+html.dark .bg-white { background-color: #1b1e29 !important; }
+html.dark [class*="bg-white/"] { background-color: rgba(27, 30, 41, 0.88) !important; }
+html.dark .bg-ink-50 { background-color: #151822 !important; }
+html.dark [class*="bg-ink-50/"] { background-color: rgba(21, 24, 34, 0.8) !important; }
+html.dark .bg-ink-100 { background-color: #272b38 !important; }
+html.dark [class*="bg-ink-100/"] { background-color: rgba(39, 43, 56, 0.7) !important; }
+html.dark .bg-ink-200 { background-color: #333849 !important; }
+html.dark .bg-brand-50 { background-color: #241f4a !important; }
+html.dark .bg-brand-100 { background-color: #2c2665 !important; }
+/* Text */
+html.dark .text-ink-900 { color: #edeff5 !important; }
+html.dark .text-ink-800 { color: #dee1eb !important; }
+html.dark .text-ink-700 { color: #c7ccda !important; }
+html.dark .text-ink-600 { color: #abb1c3 !important; }
+html.dark .text-ink-500 { color: #959cb1 !important; }
+html.dark .text-ink-400 { color: #7d8498 !important; }
+html.dark .text-ink-300 { color: #656c82 !important; }
+html.dark .text-brand-700 { color: #a5b4fc !important; }
+html.dark .text-brand-600 { color: #a5b4fc !important; }
+/* Borders */
+html.dark .border-ink-50 { border-color: #232735 !important; }
+html.dark .border-ink-100 { border-color: #2b3040 !important; }
+html.dark [class*="border-ink-100/"] { border-color: #2b3040 !important; }
+html.dark .border-ink-200 { border-color: #353b4c !important; }
+html.dark [class*="border-white/"] { border-color: #2b3040 !important; }
+/* Editor caret + selection */
+html.dark .rich-editor { color: #edeff5; }
+html.dark ::selection { background: rgba(129, 140, 248, 0.35); }
+
 html,
 body,
 #root {

@@ -114,6 +114,130 @@ function escapeRe(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+/**
+ * High-precision grammar rules (correctness). Each matches a whole phrase and
+ * replaces it, so offsets stay exact. Patterns are deliberately conservative to
+ * avoid false positives.
+ */
+interface GrammarRule {
+  re: RegExp
+  rule: string
+  message: string
+  replace: (m: RegExpExecArray) => string
+}
+
+const DN: Record<string, string> = {
+  no: 'any',
+  nothing: 'anything',
+  nobody: 'anybody',
+  none: 'any',
+  never: 'ever',
+  nowhere: 'anywhere',
+  neither: 'either',
+}
+
+const GRAMMAR_RULES: GrammarRule[] = [
+  // "should of" → "should have"
+  {
+    re: /\b(should|would|could|must|might|may)\s+of\b/gi,
+    rule: 'Word choice',
+    message: '“of” should be “have” after this verb.',
+    replace: (m) => `${m[1]} have`,
+  },
+  // your / you're
+  {
+    re: /\byour\s+welcome\b/gi,
+    rule: 'Confused word',
+    message: 'Did you mean “you’re welcome” (you are)?',
+    replace: () => `you're welcome`,
+  },
+  {
+    re: /\byour\s+(a|an)\b/gi,
+    rule: 'Confused word',
+    message: 'Did you mean “you’re” (you are)?',
+    replace: (m) => `you're ${m[1]}`,
+  },
+  {
+    re: /\byour\s+(going|gonna|getting|coming|kidding|doing|being|welcome|invited)\b/gi,
+    rule: 'Confused word',
+    message: 'Did you mean “you’re” (you are)?',
+    replace: (m) => `you're ${m[1]}`,
+  },
+  // their → there (existential)
+  {
+    re: /\btheir\s+(is|are|was|were|will|has|have|been|would|could|should)\b/gi,
+    rule: 'Confused word',
+    message: 'Did you mean “there”?',
+    replace: (m) => `there ${m[1]}`,
+  },
+  // there/their → they're
+  {
+    re: /\b(there|their)\s+(going|gonna|coming|getting)\b/gi,
+    rule: 'Confused word',
+    message: 'Did you mean “they’re” (they are)?',
+    replace: (m) => `they're ${m[2]}`,
+  },
+  // to → too
+  {
+    re: /\bto\s+(much|many|late|early|big|small|hard|easy|good|long|short|far|fast|slow|old|young|soon|often|expensive|cheap|busy|tired|loud|quiet)\b/gi,
+    rule: 'Confused word',
+    message: 'Did you mean “too”?',
+    replace: (m) => `too ${m[1]}`,
+  },
+  // then → than (after comparatives)
+  {
+    re: /\b(more|less|better|worse|greater|fewer|bigger|smaller|larger|older|younger|rather|faster|slower|higher|lower|cheaper|easier|harder|stronger|weaker|sooner|other|else)\s+then\b/gi,
+    rule: 'Confused word',
+    message: 'Use “than” for comparisons.',
+    replace: (m) => `${m[1]} than`,
+  },
+  // its → it's (it is)
+  {
+    re: /\bits\s+(a|an|not|going|gonna|been|too|so|very|time|clear|important|possible)\b/gi,
+    rule: 'Confused word',
+    message: 'Did you mean “it’s” (it is)?',
+    replace: (m) => `it's ${m[1]}`,
+  },
+  // subject–verb agreement
+  {
+    re: /\b(we|they|you)\s+was\b/gi,
+    rule: 'Subject-verb agreement',
+    message: 'Use “were” with this subject.',
+    replace: (m) => `${m[1]} were`,
+  },
+  {
+    re: /\b(he|she|it)\s+don't\b/gi,
+    rule: 'Subject-verb agreement',
+    message: 'Use “doesn’t” with this subject.',
+    replace: (m) => `${m[1]} doesn't`,
+  },
+  {
+    re: /\b(we|they|you|i)\s+doesn't\b/gi,
+    rule: 'Subject-verb agreement',
+    message: 'Use “don’t” with this subject.',
+    replace: (m) => `${m[1]} don't`,
+  },
+  {
+    re: /\b(we|they|you)\s+is\b/gi,
+    rule: 'Subject-verb agreement',
+    message: 'Use “are” with this subject.',
+    replace: (m) => `${m[1]} are`,
+  },
+  // alot → a lot
+  {
+    re: /\balot\b/gi,
+    rule: 'Word choice',
+    message: '“alot” isn’t a word — use “a lot”.',
+    replace: () => 'a lot',
+  },
+]
+
+const SENTENCE_ABBR = new Set([
+  'mr', 'mrs', 'ms', 'dr', 'prof', 'sr', 'jr', 'st', 'vs', 'etc', 'eg', 'ie',
+  'ex', 'no', 'al', 'inc', 'ltd', 'co', 'u.s', 'u.k', 'a.m', 'p.m', 'approx',
+  'dept', 'est', 'fig', 'gov', 'capt', 'col', 'sgt', 'lt', 'ph.d', 'i.e', 'e.g',
+])
+
 function scanPhrases(
   text: string,
   phrases: string[] | Record<string, string>,
@@ -262,6 +386,68 @@ export function runRules(text: string): Suggestion[] {
         end: m.index + m[0].length,
         original: m[0],
         replacements: [`${m[1]}${m[2]} ${m[3]}`],
+      })
+    }
+  }
+
+  // Grammar rules (confused words, agreement, double negatives, etc.)
+  for (const g of GRAMMAR_RULES) {
+    g.re.lastIndex = 0
+    let m: RegExpExecArray | null
+    while ((m = g.re.exec(text)) !== null) {
+      const rep = matchCase(m[0], g.replace(m))
+      raw.push({
+        category: 'correctness',
+        rule: g.rule,
+        message: g.message,
+        start: m.index,
+        end: m.index + m[0].length,
+        original: m[0],
+        replacements: [rep],
+      })
+      if (m.index === g.re.lastIndex) g.re.lastIndex++
+    }
+  }
+
+  // Double negatives — a negative verb followed (within a couple of words) by
+  // another negative word. Lookbehind so we only replace the second negative.
+  {
+    const re =
+      /(?<=(?:\bnot|n['’]t)\s+(?:\w+\s+){0,2})(no|nothing|nobody|none|never|nowhere|neither)\b/gi
+    let m: RegExpExecArray | null
+    while ((m = re.exec(text)) !== null) {
+      raw.push({
+        category: 'correctness',
+        rule: 'Double negative',
+        message: 'This is a double negative — it can confuse readers.',
+        start: m.index,
+        end: m.index + m[0].length,
+        original: m[0],
+        replacements: [DN[m[0].toLowerCase()] ?? m[0]],
+      })
+      if (m.index === re.lastIndex) re.lastIndex++
+    }
+  }
+
+  // Sentence-start capitalization (guarded against abbreviations)
+  {
+    const re = /(^|([A-Za-z][A-Za-z.]*)[.!?]["')\]]?\s+)([a-z])/g
+    let m: RegExpExecArray | null
+    while ((m = re.exec(text)) !== null) {
+      const prev = m[2]
+      if (prev) {
+        const p = prev.toLowerCase().replace(/\.$/, '')
+        if (prev.length === 1 || SENTENCE_ABBR.has(p)) continue
+      }
+      const pos = m.index + m[1].length
+      raw.push({
+        category: 'correctness',
+        rule: 'Capitalization',
+        message: 'Capitalize the first letter of the sentence.',
+        start: pos,
+        end: pos + 1,
+        original: m[3],
+        replacements: [m[3].toUpperCase()],
       })
     }
   }

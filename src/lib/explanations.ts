@@ -24,6 +24,16 @@ export const EXPLANATIONS: Record<string, string> = {
     'This is an overused expression that has lost its impact. A fresh, specific phrasing will engage your reader more.',
   'Passive voice':
     'In the passive voice the subject receives the action instead of doing it (“the report was written by the team”). The active voice (“the team wrote the report”) is usually clearer and more direct.',
+  'Confused word':
+    'These words sound alike but mean different things (their/there/they’re, your/you’re, its/it’s, to/too, then/than). Picking the right one keeps your meaning clear and your writing credible.',
+  'Subject-verb agreement':
+    'The verb should match its subject. Singular subjects (he, she, it) take “doesn’t” and “is”; plural subjects (we, they, you) take “don’t” and “are”. For example, “he doesn’t” and “they were”.',
+  'Word choice':
+    'A word or phrase here isn’t standard written English (for example, “should of” or “alot”). The suggested form is the correct one.',
+  'Capitalization':
+    'Every sentence should begin with a capital letter. This is a basic convention that makes text easier to read.',
+  'Double negative':
+    'Two negatives in one clause (like “don’t have no”) can cancel out or confuse the reader. Use a single negative — for example, “don’t have any”.',
   'Hedging language':
     'Hedging phrases like “I think” or “maybe” can make your writing sound uncertain. Stating your point directly gives it more authority.',
 }

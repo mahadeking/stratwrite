@@ -434,6 +434,8 @@ export default function App() {
         onClearDictionary={clearDictionary}
         onClearAllData={clearAllData}
         onOpenSettings={() => setShowSettings(true)}
+        dark={settings.dark}
+        onToggleTheme={() => toggleSetting('dark')}
       />
     ) : (
       <div className="flex h-full w-full flex-col bg-ink-50/30">
@@ -446,6 +448,8 @@ export default function App() {
         onSample={loadSample}
         onExport={exportDoc}
         onOpenSettings={() => setShowSettings(true)}
+        dark={settings.dark}
+        onToggleTheme={() => toggleSetting('dark')}
       />
 
       <div className="flex min-h-0 flex-1">

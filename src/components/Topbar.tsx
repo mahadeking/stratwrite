@@ -12,9 +12,11 @@ interface Props {
   onSample: () => void
   onExport: (format: ExportFormat) => void
   onOpenSettings: () => void
+  dark: boolean
+  onToggleTheme: () => void
 }
 
-export default function Topbar({ title, onTitle, stats, onHome, onClear, onSample, onExport, onOpenSettings }: Props) {
+export default function Topbar({ title, onTitle, stats, onHome, onClear, onSample, onExport, onOpenSettings, dark, onToggleTheme }: Props) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -95,6 +97,15 @@ export default function Topbar({ title, onTitle, stats, onHome, onClear, onSampl
       </button>
 
       <button
+        onClick={onToggleTheme}
+        aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+        title={dark ? 'Light mode' : 'Dark mode'}
+        className="grid h-9 w-9 place-items-center rounded-lg text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-800"
+      >
+        <ThemeIcon dark={dark} />
+      </button>
+
+      <button
         onClick={onOpenSettings}
         aria-label="Settings"
         className="grid h-9 w-9 place-items-center rounded-lg text-ink-500 transition-colors hover:bg-ink-50 hover:text-ink-800"
@@ -128,6 +139,21 @@ export default function Topbar({ title, onTitle, stats, onHome, onClear, onSampl
         )}
       </div>
     </header>
+  )
+}
+
+export function ThemeIcon({ dark }: { dark: boolean }) {
+  return dark ? (
+    // Sun (click to go light)
+    <svg width="18" height="18" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  ) : (
+    // Moon (click to go dark)
+    <svg width="18" height="18" viewBox="0 0 24 24">
+      <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </svg>
   )
 }
 

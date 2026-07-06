@@ -26,6 +26,8 @@ interface Props {
   onClearDictionary: () => void
   onClearAllData: () => void
   onOpenSettings: () => void
+  dark: boolean
+  onToggleTheme: () => void
 }
 
 type Nav = 'docs' | 'templates' | 'versions' | 'trash' | 'account' | 'apps' | 'support'
@@ -197,6 +199,23 @@ export default function DocsHome(props: Props) {
               <path d="M6 9a6 6 0 0112 0c0 5 2 6 2 6H4s2-1 2-6M9.5 20a2.5 2.5 0 005 0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-correctness ring-2 ring-white" />
+          </button>
+          <button
+            onClick={props.onToggleTheme}
+            aria-label={props.dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={props.dark ? 'Light mode' : 'Dark mode'}
+            className="grid h-10 w-10 place-items-center rounded-full bg-white text-ink-500 shadow-card transition-colors hover:text-ink-800"
+          >
+            {props.dark ? (
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+              </svg>
+            )}
           </button>
           <button onClick={props.onOpenSettings} aria-label="Settings" className="grid h-10 w-10 place-items-center rounded-full bg-white text-ink-500 shadow-card transition-colors hover:text-ink-800">
             <svg width="18" height="18" viewBox="0 0 24 24">

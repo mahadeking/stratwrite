@@ -77,9 +77,15 @@ host.id = 'stratwrite-ext-host'
 host.style.cssText =
   'position:fixed;inset:0;pointer-events:none;z-index:2147483647;'
 const shadow = host.attachShadow({ mode: 'open' })
-const styleEl = document.createElement('style')
-styleEl.textContent = SHADOW_CSS
-shadow.appendChild(styleEl)
+try {
+  const sheet = new CSSStyleSheet()
+  sheet.replaceSync(SHADOW_CSS)
+  ;(shadow as any).adoptedStyleSheets = [sheet]
+} catch {
+  const styleEl = document.createElement('style')
+  styleEl.textContent = SHADOW_CSS
+  shadow.appendChild(styleEl)
+}
 const layer = document.createElement('div')
 shadow.appendChild(layer)
 ;(document.documentElement || document.body).appendChild(host)

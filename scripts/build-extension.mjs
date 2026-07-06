@@ -23,6 +23,7 @@ await build({
 
 await cp('extension/manifest.json', `${outdir}/manifest.json`)
 await cp('extension/popup.html', `${outdir}/popup.html`)
+await cp('extension/icons', `${outdir}/icons`, { recursive: true })
 
 console.log('\n✓ Extension built to ./' + outdir)
 console.log('  Load it in Chrome/Edge: chrome://extensions → Developer mode → Load unpacked → select this folder.')

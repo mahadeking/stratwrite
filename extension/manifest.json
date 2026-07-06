@@ -3,9 +3,21 @@
   "name": "StratWrite — Writing Assistant",
   "version": "0.1.0",
   "description": "Spelling, grammar, and clarity suggestions on any website. By Transparency Strategies.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "StratWrite"
+    "default_title": "StratWrite",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
   },
   "background": {
     "service_worker": "background.js"

@@ -338,7 +338,11 @@ export function runRules(text: string): Suggestion[] {
     while ((m = re.exec(text)) !== null) {
       const article = m[1].toLowerCase()
       const next = m[2].toLowerCase()
-      const startsVowelSound = /^[aeiou]/.test(next) && !/^(uni|use|user|euro|one|once)/.test(next)
+      // Vowel *sound*, not just vowel letter: silent-h words (honest, hour…)
+      // take "an"; some vowel-letter words that sound like consonants take "a".
+      const silentH = /^(honest|hono[ur]|honou?r|hour|heir|homage)/.test(next)
+      const consonantSoundVowel = /^(uni|use|user|usu|usa|euro|one|once|ewe| union)/.test(next)
+      const startsVowelSound = (/^[aeiou]/.test(next) && !consonantSoundVowel) || silentH
       const correct = startsVowelSound ? 'an' : 'a'
       if (article !== correct) {
         const fixed = matchCase(m[1], correct)

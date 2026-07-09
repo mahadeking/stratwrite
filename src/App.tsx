@@ -8,6 +8,7 @@ import SettingsModal, { DEFAULT_SETTINGS, type Settings } from './components/Set
 import DocsHome from './components/DocsHome'
 import type { Goals } from './components/GoalsPanel'
 import { checkText } from './lib/checker'
+import { loadDictionary, isDictReady } from './lib/spell'
 import { detectTone } from './lib/tone'
 import {
   loadDocs,
@@ -105,6 +106,12 @@ export default function App() {
   })
   const [showSettings, setShowSettings] = useState(false)
   const [mobilePanel, setMobilePanel] = useState(false)
+  const [dictReady, setDictReady] = useState(isDictReady())
+
+  // Load the spell-check dictionary in the background (keeps first paint fast).
+  useEffect(() => {
+    loadDictionary().then(() => setDictReady(true))
+  }, [])
 
   // Apply the dark theme class on <html>.
   useEffect(() => {
@@ -131,7 +138,7 @@ export default function App() {
       250,
     )
     return () => clearTimeout(t)
-  }, [text, userDict, view, settings.spelling, settings.grammarStyle])
+  }, [text, userDict, view, settings.spelling, settings.grammarStyle, dictReady])
 
   // Debounced auto-save of the current document.
   useEffect(() => {

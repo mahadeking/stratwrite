@@ -1,8 +1,27 @@
-import wordArray from 'an-array-of-english-words'
 import type { Suggestion } from '../types'
 
-// Build a fast lookup set (all lowercase).
-const DICT = new Set<string>(wordArray as unknown as string[])
+// The full English word list (~2.5 MB) is loaded lazily so the app can start
+// instantly; spell-check switches on once it's ready.
+let DICT: Set<string> | null = null
+let loadingPromise: Promise<void> | null = null
+
+export function loadDictionary(): Promise<void> {
+  if (DICT) return Promise.resolve()
+  if (!loadingPromise) {
+    loadingPromise = import('an-array-of-english-words').then((mod) => {
+      const words = ((mod as any).default ?? mod) as string[]
+      const d = new Set<string>(words)
+      for (const w of EXTRA) d.add(w)
+      for (const a of ACRONYMS) d.add(a)
+      DICT = d
+    })
+  }
+  return loadingPromise
+}
+
+export function isDictReady(): boolean {
+  return DICT !== null
+}
 
 // Common words / contractions / tech terms the base list may miss.
 const EXTRA = [
@@ -16,7 +35,6 @@ const EXTRA = [
   'app', 'apps', 'login', 'signup', 'ok', 'okay', 'internet', 'wifi',
   'smartphone', 'ai', 'url', 'urls', 'faq', 'ceo', 'api',
 ]
-for (const w of EXTRA) DICT.add(w)
 
 // Common acronyms/initialisms — so we don't flag them once we start checking
 // ALL-CAPS words. (Lowercased; known() lowercases before lookup.)
@@ -28,7 +46,6 @@ const ACRONYMS = [
   'pin', 'atm', 'diy', 'asap', 'rsvp', 'aka', 'vip', 'pm', 'am', 'us', 'ok',
   'ceo', 'faq', 'ceo', 'wifi', 'url', 'api', 'sms', 'gif', 'ceo', 'phd',
 ]
-for (const a of ACRONYMS) DICT.add(a)
 
 // A small set of frequent words used to rank suggestions (more common first).
 const COMMON = new Set<string>([
@@ -51,7 +68,7 @@ const WORD_RE = /[A-Za-z]+(?:['’][A-Za-z]+)*/g
 
 function known(word: string): boolean {
   const lower = word.toLowerCase().replace(/’/g, "'")
-  return DICT.has(lower)
+  return !DICT || DICT.has(lower)
 }
 
 function edits1(word: string): Set<string> {
@@ -81,8 +98,10 @@ function rankCandidate(cand: string, original: string): number {
 }
 
 function suggestFor(word: string): string[] {
+  const dict = DICT
+  if (!dict) return []
   const lower = word.toLowerCase()
-  const e1 = [...edits1(lower)].filter((w) => DICT.has(w))
+  const e1 = [...edits1(lower)].filter((w) => dict.has(w))
   let candidates = e1
   if (candidates.length < 3) {
     // edits2, but keep it bounded
@@ -90,7 +109,7 @@ function suggestFor(word: string): string[] {
     let budget = 4000
     for (const w of edits1(lower)) {
       for (const w2 of edits1(w)) {
-        if (DICT.has(w2)) e2.add(w2)
+        if (dict.has(w2)) e2.add(w2)
         if (--budget <= 0) break
       }
       if (budget <= 0) break

@@ -500,6 +500,7 @@ export default function App() {
           activeId={activeId}
           goals={goals}
           tone={tone}
+          text={text}
           showTone={settings.tone}
           onGoals={setGoals}
           onActivate={setActiveId}

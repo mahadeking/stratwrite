@@ -6,9 +6,10 @@ import ScoreRing from './ScoreRing'
 import SuggestionCard from './SuggestionCard'
 import GoalsPanel, { type Goals } from './GoalsPanel'
 import ToneTab from './ToneTab'
+import InsightsPanel from './InsightsPanel'
 import AIPanel from './AIPanel'
 
-type Tab = 'suggestions' | 'tone' | 'goals' | 'assistant'
+type Tab = 'suggestions' | 'tone' | 'insights' | 'goals' | 'assistant'
 type Filter = Category | 'all'
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
   activeId: string | null
   goals: Goals
   tone: ToneResult
+  text: string
   showTone?: boolean
   onGoals: (g: Goals) => void
   onActivate: (id: string | null) => void
@@ -33,6 +35,7 @@ export default function Sidebar({
   activeId,
   goals,
   tone,
+  text,
   showTone = true,
   onGoals,
   onActivate,
@@ -77,6 +80,7 @@ export default function Sidebar({
   const tabs: { id: Tab; label: string; badge?: number }[] = [
     { id: 'suggestions', label: 'Review', badge: total },
     ...(showTone ? [{ id: 'tone' as Tab, label: 'Tone' }] : []),
+    { id: 'insights', label: 'Insights' },
     { id: 'goals', label: 'Goals' },
     { id: 'assistant', label: 'AI' },
   ]
@@ -214,7 +218,8 @@ export default function Sidebar({
         )}
 
         {tab === 'tone' && <ToneTab tone={tone} goals={goals} />}
-        {tab === 'goals' && <GoalsPanel goals={goals} onChange={onGoals} stats={result.stats} />}
+        {tab === 'insights' && <InsightsPanel stats={result.stats} text={text} />}
+        {tab === 'goals' && <GoalsPanel goals={goals} onChange={onGoals} />}
         {tab === 'assistant' && <AIPanel />}
       </div>
     </aside>

@@ -60,9 +60,12 @@ export interface CheckOptions {
 }
 
 export function checkText(text: string, userDict?: Set<string>, opts?: CheckOptions): CheckResult {
+  // Rules run BEFORE spelling so that when a precise grammar rule and a raw
+  // spelling guess cover the same span (e.g. "alot" → the rule "a lot" vs. the
+  // corrector's "alto"), dedupeOverlaps keeps the higher-quality rule.
   const all = [
-    ...(opts?.spelling !== false ? checkSpelling(text, userDict) : []),
     ...(opts?.grammarStyle !== false ? runRules(text) : []),
+    ...(opts?.spelling !== false ? checkSpelling(text, userDict) : []),
   ]
   const suggestions = dedupeOverlaps(all)
   const stats = computeStats(text)

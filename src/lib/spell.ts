@@ -102,7 +102,8 @@ const COMMON_MISSPELLINGS: Record<string, string> = {
   wether: 'whether', writting: 'writing', alomst: 'almost', teh: 'the', hte: 'the',
   adn: 'and', nad: 'and', ot: 'to', fo: 'of', accross: 'across', agian: 'again',
   alright: 'all right', aparent: 'apparent', basicly: 'basically', begining: 'beginning',
-  beofre: 'before', wfull: 'well',
+  beofre: 'before', mispell: 'misspell', mispelled: 'misspelled',
+  mispelling: 'misspelling', neccessary: 'necessary', neccesary: 'necessary',
 }
 
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz'
@@ -141,11 +142,12 @@ function rankCandidate(cand: string, original: string): number {
   let score = 0
   if (COMMON.has(cand)) score -= 50
   // Reward shared leading letters — the more of the word that matches before the
-  // typo, the likelier this is the intended word (receive vs. relieve).
-  score -= commonPrefix(cand, original) * 4
-  if (cand[0] === original[0]) score -= 10 // same first letter is usually right
-  if (cand.length === original.length) score -= 5
-  score += Math.abs(cand.length - original.length)
+  // typo, the likelier this is the intended word (messages vs. menages for
+  // "mesages"). Weighted strongly so a longer prefix beats an equal-length rival.
+  score -= commonPrefix(cand, original) * 6
+  if (cand[0] === original[0]) score -= 8 // same first letter is usually right
+  if (cand.length === original.length) score -= 2 // mild: many typos add/drop a letter
+  score += Math.abs(cand.length - original.length) * 2
   return score
 }
 
